@@ -1,6 +1,6 @@
 package feedback
 
-//Storage mecanism for caching strings
-type Feedback interface {
+//Feedback mecanism
+type Message interface {
 	Send(key string)
 }

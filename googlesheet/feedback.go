@@ -8,11 +8,25 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/sheets/v4"
 )
+
+type Message struct {
+	time     time.Time
+	Feedback string
+}
+
+//NewFeedback creates a new in googlesheet feedback
+func NewFeedback() *Message {
+	return &Message{
+		time:     time.Now(),
+		Feedback: "123",
+	}
+}
 
 // Retrieve a token, saves the token, then returns the generated client.
 func getClient(config *oauth2.Config) *http.Client {
@@ -67,7 +81,7 @@ func saveToken(path string, token *oauth2.Token) {
 }
 
 // Send - Init func
-func Send() {
+func (f Message) Send() {
 	b, err := ioutil.ReadFile("credentials.json")
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
@@ -86,14 +100,13 @@ func Send() {
 	}
 	spreadsheetID := "19Rk6QACMPc5W2Am1_odkY5Mb8nZLFkouok0BYgvO"
 	Range := "A1"
-	valueInputOption := "RAW"
 
 	var vr sheets.ValueRange
 
 	myval := []interface{}{"One", "Two", "Three"}
 	vr.Values = append(vr.Values, myval)
 
-	_, err = srv.Spreadsheets.Values.Update(spreadsheetId, writeRange, &vr).ValueInputOption("RAW").Do()
+	_, err = srv.Spreadsheets.Values.Update(spreadsheetID, Range, &vr).ValueInputOption("RAW").Do()
 	if err != nil {
 		log.Fatalf("Unable to retrieve data from sheet. %v", err)
 	}
