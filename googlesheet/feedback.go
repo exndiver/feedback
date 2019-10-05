@@ -101,7 +101,7 @@ func (f Message) Send(spreadsheetID string) {
 	if err != nil {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
-	Range := "A:C"
+	Range := "A1"
 
 	var vr sheets.ValueRange
 
