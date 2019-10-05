@@ -15,16 +15,17 @@ import (
 	"google.golang.org/api/sheets/v4"
 )
 
+// Message - Structure of feedback
 type Message struct {
-	time     time.Time
+	time     string
 	Feedback string
 }
 
 //NewFeedback creates a new in googlesheet feedback
-func NewFeedback() *Message {
+func NewFeedback(t string) *Message {
 	return &Message{
-		time:     time.Now(),
-		Feedback: "123",
+		time:     time.Now().String(),
+		Feedback: t,
 	}
 }
 
@@ -81,7 +82,7 @@ func saveToken(path string, token *oauth2.Token) {
 }
 
 // Send - Init func
-func (f Message) Send() {
+func (f Message) Send(spreadsheetID string) {
 	b, err := ioutil.ReadFile("credentials.json")
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
@@ -98,15 +99,14 @@ func (f Message) Send() {
 	if err != nil {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
-	spreadsheetID := "19Rk6QACMPc5W2Am1_odkY5Mb8nZLFkouok0BYgvO"
-	Range := "A1"
+	Range := "A:B"
 
 	var vr sheets.ValueRange
 
-	myval := []interface{}{"One", "Two", "Three"}
+	myval := []interface{}{f.time, f.Feedback}
 	vr.Values = append(vr.Values, myval)
 
-	_, err = srv.Spreadsheets.Values.Update(spreadsheetID, Range, &vr).ValueInputOption("RAW").Do()
+	_, err = srv.Spreadsheets.Values.Append(spreadsheetID, Range, &vr).ValueInputOption("RAW").Do()
 	if err != nil {
 		log.Fatalf("Unable to retrieve data from sheet. %v", err)
 	}
