@@ -18,13 +18,15 @@ import (
 // Message - Structure of feedback
 type Message struct {
 	time     string
+	context  string
 	Feedback string
 }
 
 //NewFeedback creates a new in googlesheet feedback
-func NewFeedback(t string) *Message {
+func NewFeedback(c string, t string) *Message {
 	return &Message{
 		time:     time.Now().String(),
+		context:  c,
 		Feedback: t,
 	}
 }
@@ -99,11 +101,11 @@ func (f Message) Send(spreadsheetID string) {
 	if err != nil {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
-	Range := "A:B"
+	Range := "A:C"
 
 	var vr sheets.ValueRange
 
-	myval := []interface{}{f.time, f.Feedback}
+	myval := []interface{}{f.time, f.context, f.Feedback}
 	vr.Values = append(vr.Values, myval)
 
 	_, err = srv.Spreadsheets.Values.Append(spreadsheetID, Range, &vr).ValueInputOption("RAW").Do()
