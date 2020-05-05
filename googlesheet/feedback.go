@@ -84,22 +84,25 @@ func saveToken(path string, token *oauth2.Token) {
 }
 
 // Send - Init func
-func (f Message) Send(spreadsheetID string) {
+func (f Message) Send(spreadsheetID string) (string, bool) {
 	b, err := ioutil.ReadFile("credentials.json")
 	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
+		return fmt.Sprintf("Unable to read client secret file: %v", err), false
+		//	log.Fatalf("Unable to read client secret file: %v", err)
 	}
 
 	// If modifying these scopes, delete your previously saved token.json.
 	config, err := google.ConfigFromJSON(b, "https://www.googleapis.com/auth/spreadsheets")
 	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
+		return fmt.Sprintf("Unable to parse client secret file to config: %v", err), false
+		//log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
 	client := getClient(config)
 
 	srv, err := sheets.New(client)
 	if err != nil {
-		log.Fatalf("Unable to retrieve Sheets client: %v", err)
+		return fmt.Sprintf("Unable to retrieve Sheets client: %v", err), false
+		//log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
 	Range := "A1"
 
@@ -110,6 +113,8 @@ func (f Message) Send(spreadsheetID string) {
 
 	_, err = srv.Spreadsheets.Values.Append(spreadsheetID, Range, &vr).ValueInputOption("RAW").Do()
 	if err != nil {
-		log.Fatalf("Unable to retrieve data from sheet. %v", err)
+		return fmt.Sprintf("Unable to retrieve data from sheet: %v", err), false
+		//log.Fatalf("Unable to retrieve data from sheet. %v", err)
 	}
+	return "Sent", true
 }
