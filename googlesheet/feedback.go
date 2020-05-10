@@ -85,7 +85,7 @@ func saveToken(path string, token *oauth2.Token) {
 
 // Send - Init func
 func (f Message) Send(spreadsheetID string) (string, bool) {
-	b, err := ioutil.ReadFile("credentials.json")
+	b, err := ioutil.ReadFile("config/credentials.json")
 	if err != nil {
 		return fmt.Sprintf("Unable to read client secret file: %v", err), false
 		//	log.Fatalf("Unable to read client secret file: %v", err)
