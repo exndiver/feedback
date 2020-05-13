@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -50,12 +49,13 @@ func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 
 	var authCode string
 	if _, err := fmt.Scan(&authCode); err != nil {
-		log.Fatalf("Unable to read authorization code: %v", err)
+		fmt.Printf("Unable to read authorization code: %v", err)
+
 	}
 
 	tok, err := config.Exchange(context.TODO(), authCode)
 	if err != nil {
-		log.Fatalf("Unable to retrieve token from web: %v", err)
+		fmt.Printf("Unable to retrieve token from web: %v", err)
 	}
 	return tok
 }
@@ -77,7 +77,7 @@ func saveToken(path string, token *oauth2.Token) {
 	fmt.Printf("Saving credential file to: %s\n", path)
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		log.Fatalf("Unable to cache oauth token: %v", err)
+		fmt.Printf("Unable to cache oauth token: %v", err)
 	}
 	defer f.Close()
 	json.NewEncoder(f).Encode(token)
@@ -88,21 +88,18 @@ func (f Message) Send(spreadsheetID string) (string, bool) {
 	b, err := ioutil.ReadFile("config/credentials.json")
 	if err != nil {
 		return fmt.Sprintf("Unable to read client secret file: %v", err), false
-		//	log.Fatalf("Unable to read client secret file: %v", err)
 	}
 
 	// If modifying these scopes, delete your previously saved token.json.
 	config, err := google.ConfigFromJSON(b, "https://www.googleapis.com/auth/spreadsheets")
 	if err != nil {
 		return fmt.Sprintf("Unable to parse client secret file to config: %v", err), false
-		//log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
 	client := getClient(config)
 
 	srv, err := sheets.New(client)
 	if err != nil {
 		return fmt.Sprintf("Unable to retrieve Sheets client: %v", err), false
-		//log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
 	Range := "A1"
 
@@ -114,7 +111,6 @@ func (f Message) Send(spreadsheetID string) (string, bool) {
 	_, err = srv.Spreadsheets.Values.Append(spreadsheetID, Range, &vr).ValueInputOption("RAW").Do()
 	if err != nil {
 		return fmt.Sprintf("Unable to retrieve data from sheet: %v", err), false
-		//log.Fatalf("Unable to retrieve data from sheet. %v", err)
 	}
 	return "Sent", true
 }
