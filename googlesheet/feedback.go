@@ -32,7 +32,7 @@ func NewFeedback(c string, t string) *Message {
 
 // Retrieve a token, saves the token, then returns the generated client.
 func getClient(config *oauth2.Config) *http.Client {
-	tokFile := "token.json"
+	tokFile := "config/token.json"
 	tok, err := tokenFromFile(tokFile)
 	if err != nil {
 		tok = getTokenFromWeb(config)
