@@ -13,24 +13,26 @@ type Message struct {
 	time     string
 	context  string
 	Feedback string
+	ChatID   string
 }
 
 //NewFeedback creates a new in googlesheet feedback
-func NewFeedback(c string, t string) *Message {
+func NewFeedback(c string, t string, chat string) *Message {
 	return &Message{
 		time:     time.Now().String(),
 		context:  c,
 		Feedback: t,
+		ChatID:   chat,
 	}
 }
 
 // Send - Init func
-func (f Message) Send(ChatID string, BotToken string) (string, bool) {
+func (f Message) Send(BotToken string) (string, bool) {
 	var telegramAPI string = "https://api.telegram.org/bot" + BotToken + "/sendMessage"
 	response, err := http.PostForm(
 		telegramAPI,
 		url.Values{
-			"chat_id": {ChatID},
+			"chat_id": {f.ChatID},
 			"text":    {f.Feedback},
 		})
 
