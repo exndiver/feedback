@@ -12,3 +12,5 @@
 *.out
 
 credentials.json
+
+.DS_Store
